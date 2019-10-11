@@ -1,0 +1,26 @@
+[
+  {
+    "Qid": 1,
+    "Question": "What is leg pains?",
+    "Correct": 4,
+    "Choice": ["Qid1", "Red", "purple", "pink", "blue", "orange"]
+  },
+  {
+    "Qid": 2,
+    "Question": "What is hypertension?",
+    "Correct": 4,
+    "Choice": ["Qid2", "Red", "purple", "pink", "blue", "orange"]
+  },
+  {
+    "Qid": 3,
+    "Question": "What is hypertension?",
+    "Correct": 2,
+    "Choice": ["Qid3", "Red", "purple", "pink", "blue", "orange"]
+  },
+  {
+    "Qid": 4,
+    "Question": "What is hypertension?",
+    "Correct": 4,
+    "Choice": ["Qid4", "Red", "purple", "pink", "blue", "orange"]
+  }
+]

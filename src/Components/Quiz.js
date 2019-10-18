@@ -7,22 +7,34 @@ import {
   Typography
 } from "@material-ui/core";
 import QData from "../Data/questionData.json";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles({
+  question: {
+    padding: 20
+  },
+  FormControl: {
+    padding: 30
+  },
+  ansDisplay: {
+    visibility: "hidden"
+  },
+  ansCorrect: {
+    color: "green",
+    fontWeight: "600"
+  },
+  ansIncorrect: {
+    color: "red",
+    fontWeight: "600"
+  }
+});
 
 function Quiz(props) {
+  const classes = useStyles();
+
   const [correctAns, setCorrectAns] = useState(null);
   const [value, setValue] = useState("");
   // styling
-  const quiz = {
-    question: {
-      padding: 20
-    },
-    FormControl: {
-      padding: 30
-    },
-    ansDisplay: {
-      visibility: "hidden"
-    }
-  };
 
   // this will check if the index of the selected radio box matches the correct answers
   // correct matches will CL "correct answer"
@@ -59,23 +71,31 @@ function Quiz(props) {
     />
   ));
 
+  // display logic for when correctAns is selected or not 
   let correctAnsDisplay;
 
   if (correctAns === true) {
-    correctAnsDisplay = <Typography> Correct </Typography>;
+    correctAnsDisplay = (
+      <Typography className={classes.ansCorrect}> Correct </Typography>
+    );
   } else if (correctAns === false) {
-    correctAnsDisplay = <Typography> Incorrect </Typography>;
+    correctAnsDisplay = (
+      <Typography className={classes.ansIncorrect}> Incorrect </Typography>
+    );
   } else {
     correctAnsDisplay = (
-      <Typography style={quiz.ansDisplay}> empty </Typography>
+      <Typography className={classes.ansDisplay}>
+        {" "}
+        invisible placeholder{" "}
+      </Typography>
     );
   }
 
   return (
     <div>
-      <FormControl component="fieldset" style={quiz.FormControl}>
-        <Typography style={quiz.question} variant="h6">
-          {OneQ.Question}
+      <FormControl component="fieldset" className={classes.FormControl}>
+        <Typography className={classes.question} variant="h6">
+          Q{props.Qid}. {OneQ.Question}
         </Typography>
         {correctAnsDisplay}
         <RadioGroup

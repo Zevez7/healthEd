@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Paper, TextField, Box, Typography, Button } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 
 // styling
-const submit = {
+const useStyles = makeStyles({
   Box: {
     textAlign: "center"
   },
@@ -33,9 +34,11 @@ const submit = {
     marginTop: 40,
     marginRight: 30
   }
-};
+});
 
-function Submit() {
+function Submit(props) {
+  const classes = useStyles();
+
   // const [title, setTitle] = useState({ title: "" });
   const [title, setTitle] = useState("");
   const [info, setInfo] = useState("");
@@ -44,42 +47,49 @@ function Submit() {
 
   const handleInfoChange = e => setInfo((e.target.name = e.target.value));
 
-  // object with a key value pair of slide and empty string
+  // object with a key of slide and a value of " "
   const blankSlide = { slide: "" };
-  // creating a pure array with dot spread notation and setting it to slide
+  // creating a pure array with dot spread notation and setting it to slide dysyr
   // this will prevent blankslide variable from changing with setSlide method call
   const [slide, setSlide] = useState([{ ...blankSlide }]);
 
   const addSlide = () => {
+    // adding object inside the slide array require dot spread notation
+    // to append the extra array to the array of slide
+    // the array of slide will then be mapped in the render function
     setSlide([...slide, { ...blankSlide }]);
   };
 
   const handleSlideChange = e => {
-    // creating a pure array with dot spread notation
+    // creating a pure array with dot spread notation of the already populated slide state
     const updatedSlides = [...slide];
     console.log("1updatedSlides", updatedSlides);
-    // find the array element with the dataset idx and setting to the value of that element
+    // find the array element with the dataset idx and setting the specific slide
+    // to the value of that element
     updatedSlides[e.target.dataset.idx] = e.target.value;
-    // update the element of that value to the slide state
     console.log("2updatedSlides", updatedSlides[e.target.dataset.idx]);
 
+    // update the element of that value to the slide state
     setSlide(updatedSlides);
   };
 
-  const handClearChange = () => {
-    setSlide([{ slide: "" }]);
+  // clear button require setState to be an empty array and string quote.
+  const handleClearChange = () => {
+    setSlide([]);
     setTitle("");
     setInfo("");
     console.log("slidecleared");
   };
 
   console.log(slide);
+
+  console.log("passedApp quizData", props.quizData);
   return (
     <>
-      <Box style={submit.Box}>
-        <Paper style={submit.Paper}>
+      <Box className={classes.Box}>
+        <Paper className={classes.Paper}>
           <Box>
-            <Typography variant="h3" style={submit.Title}>
+            <Typography variant="h3" className={classes.Title}>
               SUBMIT
             </Typography>
           </Box>
@@ -88,11 +98,12 @@ function Submit() {
               label="Title"
               name="title"
               id="title"
-              style={submit.TextField}
+              className={classes.TextField}
               value={title}
               onChange={handleTitleChange}
               margin="normal"
               variant="outlined"
+              fullWidth
             />
             <br />
 
@@ -100,11 +111,14 @@ function Submit() {
               label="Info"
               name="info"
               id="info"
-              style={submit.TextField}
+              className={classes.TextField}
               value={info}
               onChange={handleInfoChange}
               margin="normal"
               variant="outlined"
+              multiline
+              rows="3"
+              fullWidth
             />
             <br />
 
@@ -118,9 +132,10 @@ function Submit() {
                     label={`Slide #${idx + 1}`}
                     name={slideId}
                     id={slideId}
-                    style={submit.TextField}
+                    className={classes.TextField}
                     InputProps={{
                       inputProps: {
+                        // this attribute is required to target the data-set of the slide array
                         "data-idx": `${idx}`
                       }
                     }}
@@ -128,6 +143,9 @@ function Submit() {
                     onChange={handleSlideChange}
                     margin="normal"
                     variant="outlined"
+                    multiline
+                    rows="3"
+                    fullWidth
                   />
                   <br />
                 </>
@@ -141,7 +159,7 @@ function Submit() {
                 variant="outlined"
                 color="primary"
                 size="large"
-                style={submit.Button}
+                className={classes.Button}
                 onClick={addSlide}
               >
                 Add New Content
@@ -155,8 +173,8 @@ function Submit() {
                 variant="outlined"
                 color="secondary"
                 size="large"
-                style={submit.Clear}
-                onClick={handClearChange}
+                className={classes.Clear}
+                onClick={handleClearChange}
               >
                 CLEAR
               </Button>
@@ -164,7 +182,7 @@ function Submit() {
                 variant="outlined"
                 color="primary"
                 size="large"
-                style={submit.Button}
+                className={classes.Button}
               >
                 Submit
               </Button>

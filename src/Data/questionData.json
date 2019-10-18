@@ -13,13 +13,13 @@
   },
   {
     "Qid": 3,
-    "Question": "What is hypertension?",
+    "Question": "How long ago?",
     "Correct": 2,
     "Choice": ["Qid3", "Red", "purple", "pink", "blue", "orange"]
   },
   {
     "Qid": 4,
-    "Question": "What is hypertension?",
+    "Question": "What is high blood pressure?",
     "Correct": 4,
     "Choice": ["Qid4", "Red", "purple", "pink", "blue", "orange"]
   }

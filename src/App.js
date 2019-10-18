@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.css";
 // import { db } from "../src/Components/Firebase";
@@ -10,8 +10,19 @@ import Login from "./Pages/Login";
 import SignUp from "./Pages/SignUp";
 import MediaPage from "./Pages/MediaPage";
 import Submit from "./Pages/Submit";
+import QData from "./Data/questionData.json";
 
 function App() {
+  const [quizData, setQuizData] = useState([]);
+
+  useEffect(() => {
+    setQuizData(QData);
+
+    // empty array for second paramater will mean that useEffect
+    // hook will only be called once right after initial rendering
+  }, []);
+
+  console.log(quizData);
   // const [dataReturn, setDataReturn] = useState([]);
 
   // parameter is passed after every render & update
@@ -32,6 +43,9 @@ function App() {
 
   // console.log(dataReturn);
 
+  // useEffect runs side effect based on certain parameter
+  // useEffect will run after every render and update
+
   return (
     <div className="App">
       <Router>
@@ -43,7 +57,10 @@ function App() {
               <Route path="/mediapage/:mediaId" component={MediaPage} />
               <Route path="/login" component={Login} />
               <Route path="/signup" component={SignUp} />
-              <Route path="/submit" component={Submit} />
+              <Route
+                path="/submit"
+                render={props => <Submit {...props} quizData={quizData} />}
+              />
             </Switch>
           </Container>
         </ScrollToTop>

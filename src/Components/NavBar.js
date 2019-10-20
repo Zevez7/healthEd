@@ -32,7 +32,7 @@ const Navbar = {
   }
 };
 
-function NavBar() {
+function NavBar(props) {
   return (
     <div>
       <AppBar position="static">
@@ -42,6 +42,7 @@ function NavBar() {
             style={Navbar.menuButton}
             color="inherit"
             aria-label="menu"
+            onClick={props.toggleDrawerOpen("left", true)}
           >
             <MenuIcon />
           </IconButton>

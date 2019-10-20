@@ -1,44 +1,47 @@
 import React, { useState } from "react";
 import { Paper, TextField, Box, Typography, Button } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles({
+  Box: {
+    textAlign: "center"
+  },
+  Paper: {
+    maxWidth: 600,
+    marginTop: 100,
+    marginLeft: "auto",
+    marginRight: "auto",
+    padding: 20,
+    paddingBottom: 40,
+    backgroundColor: "whitesmoke"
+  },
+  TextField: {
+    marginTop: 30,
+    backgroundColor: "white"
+  },
+
+  Title: {
+    margin: 30,
+    fontWeight: "900"
+  },
+  Button: {
+    backgroundColor: "white",
+    marginTop: 40
+  }
+});
 
 function SignUp() {
+  const classes = useStyles();
+
   const [values, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const SignUp = {
-    Box: {
-      textAlign: "center"
-    },
-    Paper: {
-      maxWidth: 600,
-      marginTop: 100,
-      marginLeft: "auto",
-      marginRight: "auto",
-      padding: 20,
-      paddingBottom: 40,
-      backgroundColor: "whitesmoke"
-    },
-    TextField: {
-      marginTop: 30,
-      backgroundColor: "white"
-    },
-
-    Title: {
-      margin: 30,
-      fontWeight: "900"
-    },
-    Button: {
-      backgroundColor: "white",
-      marginTop: 40
-    }
-  };
-
   return (
     <div>
-      <Box style={SignUp.Box}>
-        <Paper style={SignUp.Paper}>
+      <Box className={classes.Box}>
+        <Paper className={classes.Paper}>
           <Box>
-            <Typography variant="h3" style={SignUp.Title}>
+            <Typography variant="h3" className={classes.Title}>
               SIGNUP
             </Typography>
           </Box>
@@ -46,7 +49,7 @@ function SignUp() {
           <TextField
             label="Email Address"
             // className={classes.textField}
-            style={SignUp.TextField}
+            className={classes.TextField}
             value={values}
             onChange={e => setEmail(e.target.value)}
             margin="normal"
@@ -56,7 +59,7 @@ function SignUp() {
           <TextField
             label="Password"
             // className={classes.textField}
-            style={SignUp.TextField}
+            className={classes.TextField}
             value={password}
             onChange={e => setPassword(e.target.value)}
             margin="normal"
@@ -67,7 +70,7 @@ function SignUp() {
               variant="outlined"
               color="primary"
               size="large"
-              style={SignUp.Button}
+              className={classes.Button}
             >
               Submit
             </Button>

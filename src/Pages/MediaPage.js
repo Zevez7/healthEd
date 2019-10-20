@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Box, Typography, Paper, Button } from "@material-ui/core";
-import TestData from "../Data/testData.json";
 import ArrowBack from "@material-ui/icons/KeyboardArrowLeft";
 import ArrowForward from "@material-ui/icons/KeyboardArrowRight";
-import Quiz from "../Components/Quiz.js";
 import { makeStyles } from "@material-ui/core/styles";
 
+import TestData from "../Data/testData.json";
+import Quiz from "../Components/Quiz.js";
+
 const useStyles = makeStyles({
-  title: { padding: 5 },
+  title: { padding: 10 },
   h100: {
     height: 100,
     width: "auto"
@@ -15,7 +16,7 @@ const useStyles = makeStyles({
   placeholder: {
     height: "auto",
     width: "auto",
-    backgroundColor: "lightgray"
+    backgroundColor: "whitesmoke"
   },
   userName: {
     padding: 5
@@ -70,7 +71,7 @@ function MediaPage({ match }) {
     <>
       <div className={classes.h100} />
       <Box className={classes.title}>
-        <Typography variant="h3">{media.title}</Typography>
+        <Typography variant="h4">{media.title}</Typography>
       </Box>
       <Paper className={classes.placeholder}>
         <Typography className={classes.slide} variant="h5">

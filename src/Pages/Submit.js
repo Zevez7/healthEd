@@ -128,7 +128,7 @@ function Submit(props) {
               return (
                 <>
                   <TextField
-                    key={`slide-${idx}`}
+                    key={`slide-${idx}-${val}`}
                     label={`Slide #${idx + 1}`}
                     name={slideId}
                     id={slideId}

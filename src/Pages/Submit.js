@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Paper, TextField, Box, Typography, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { db } from "../Components/Firebase";
+import { UserContext } from "../App";
 
 // styling
 const useStyles = makeStyles({
@@ -17,7 +19,7 @@ const useStyles = makeStyles({
     backgroundColor: "whitesmoke"
   },
   TextField: {
-    marginTop: 10,
+    marginTop: 20,
     backgroundColor: "white"
   },
 
@@ -33,22 +35,49 @@ const useStyles = makeStyles({
     backgroundColor: "white",
     marginTop: 40,
     marginRight: 30
+  },
+  Question: {
+    textAlign: "left",
+    paddingLeft: 5
+  },
+  QTypo: {
+    fontSize: "0.7rem"
   }
 });
 
 function Submit(props) {
   const classes = useStyles();
+  const userCT = useContext(UserContext);
 
+  // useEffect(() => {
+
+  // }, []);
+
+  //****testing
+  console.log("userCT", userCT);
   // const [title, setTitle] = useState({ title: "" });
   const [title, setTitle] = useState("");
   const [info, setInfo] = useState("");
 
   const handleTitleChange = e => setTitle((e.target.name = e.target.value));
-
   const handleInfoChange = e => setInfo((e.target.name = e.target.value));
 
+  const addMedia = e => {
+    e.preventDefault();
+
+    db.collection(`media`).add({
+      title: title,
+      info: info,
+      slide: slide
+    });
+
+    setTitle("");
+    setInfo("");
+    setSlide([]);
+  };
+
   // object with a key of slide and a value of " "
-  const blankSlide = { slide: "" };
+  const blankSlide = {};
   // creating a pure array with dot spread notation and setting it to slide dysyr
   // this will prevent blankslide variable from changing with setSlide method call
   const [slide, setSlide] = useState([{ ...blankSlide }]);
@@ -56,7 +85,8 @@ function Submit(props) {
   const addSlide = () => {
     // adding object inside the slide array require dot spread notation
     // to append the extra array to the array of slide
-    // the array of slide will then be mapped in the render function
+    // the array of slide will then be mapped in the return
+    // the mapping will added all the name,key, label, id
     setSlide([...slide, { ...blankSlide }]);
   };
 
@@ -64,9 +94,12 @@ function Submit(props) {
     // creating a pure array with dot spread notation of the already populated slide state
     const updatedSlides = [...slide];
     console.log("1updatedSlides", updatedSlides);
-    // find the array element with the dataset idx and setting the specific slide
-    // to the value of that element
-    updatedSlides[e.target.dataset.idx] = e.target.value;
+    //adding nested obj using bracket updateslide[1][content] to e.target.value
+    // the updateslide will update input changed based on the target.dataset.idx
+    updatedSlides[e.target.dataset.idx]["content"] = e.target.value;
+
+    // @todo add quiz id here
+
     console.log("2updatedSlides", updatedSlides[e.target.dataset.idx]);
 
     // update the element of that value to the slide state
@@ -81,7 +114,7 @@ function Submit(props) {
     console.log("slidecleared");
   };
 
-  console.log(slide);
+  console.log("slide", slide);
 
   console.log("passedApp quizData", props.quizData);
   return (
@@ -90,10 +123,10 @@ function Submit(props) {
         <Paper className={classes.Paper}>
           <Box>
             <Typography variant="h3" className={classes.Title}>
-              SUBMIT
+              SUBMIT MEDIA
             </Typography>
           </Box>
-          <form>
+          <form onSubmit={addMedia}>
             <TextField
               label="Title"
               name="title"
@@ -104,6 +137,7 @@ function Submit(props) {
               margin="normal"
               variant="outlined"
               fullWidth
+              required={true}
             />
             <br />
 
@@ -119,16 +153,17 @@ function Submit(props) {
               multiline
               rows="3"
               fullWidth
+              required={true}
             />
             <br />
 
             {slide.map((val, idx) => {
-              // when mapping create a new const slideId from the index value of the map
+              //  mapping create a new const slideId from the index value of the map
               const slideId = `slide-${idx}`;
               return (
                 <>
                   <TextField
-                    key={`slide-${idx}-${val}`}
+                    key={`slide-${idx}`}
                     label={`Slide #${idx + 1}`}
                     name={slideId}
                     id={slideId}
@@ -146,7 +181,9 @@ function Submit(props) {
                     multiline
                     rows="3"
                     fullWidth
+                    required={true}
                   />
+
                   <br />
                 </>
               );
@@ -162,7 +199,7 @@ function Submit(props) {
                 className={classes.Button}
                 onClick={addSlide}
               >
-                Add New Content
+                Add New Slide
               </Button>
             </Box>
 
@@ -183,6 +220,7 @@ function Submit(props) {
                 color="primary"
                 size="large"
                 className={classes.Button}
+                type="submit"
               >
                 Submit
               </Button>

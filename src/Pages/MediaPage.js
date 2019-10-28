@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Typography, Paper, Button } from "@material-ui/core";
 import ArrowBack from "@material-ui/icons/KeyboardArrowLeft";
 import ArrowForward from "@material-ui/icons/KeyboardArrowRight";
 import { makeStyles } from "@material-ui/core/styles";
-
-import TestData from "../Data/testData.json";
 import Quiz from "../Components/Quiz.js";
+import { MediaContext } from "../App";
 
 const useStyles = makeStyles({
   title: { padding: 10 },
@@ -42,21 +41,48 @@ const useStyles = makeStyles({
   }
 });
 
-function MediaPage({ match }) {
+function MediaPage(props) {
   const classes = useStyles();
 
+  const mediaCT = useContext(MediaContext);
+
+  // data is populated by props passed down and match with url parameter mediaId and filtered
+  // media var will be set first
+  // changes in the media will cause useEffect to run
+
+  const mediaLS = JSON.parse(localStorage.getItem("mediaLS"));
+  //****testing
+  console.log("mediaLS", mediaLS);
+
+  // set media to passed mediaCT or mediaLS
   const media =
-    TestData &&
-    TestData.find(item => item.id.toString() === match.params.mediaId);
+    mediaCT.length > 0
+      ? mediaCT.find(item => item.id.toString() === props.match.params.mediaId)
+      : mediaLS;
+
+  //****testing
+  console.log("mediaCT", mediaCT);
+  console.log("media", media);
+
+  useEffect(() => {
+    //store filtered media to localStorage called mediaLS
+    //when media changes, store a new localStorage with useEffect
+    localStorage.setItem("mediaLS", JSON.stringify(media));
+    console.log("useEffect mediaLS");
+  }, [media]);
+
+  console.log("media after useEffect", media);
+
+  //****testing
+  // console.log("mediaState", mediaState);
 
   // setting state for slide count to display
-  const [count, setCount] = useState(1);
+  const [count, setCount] = useState(0);
 
-  const countMax = Object.keys(media.slide).length;
+  const countMax = Object.keys(media.slide).length - 1;
 
-  console.log(countMax);
   // logic to disable to show back arrow and front arrow
-  const disableBack = () => (count === 1 ? true : false);
+  const disableBack = () => (count === 0 ? true : false);
   const disableForward = () => (count === countMax ? true : false);
 
   const ArrowBackButton = () => {
@@ -67,6 +93,7 @@ function MediaPage({ match }) {
   const arrowForwardClickHandle = () => {
     setCount(count + 1);
   };
+
   return (
     <>
       <div className={classes.h100} />
@@ -79,12 +106,13 @@ function MediaPage({ match }) {
         </Typography>
       </Paper>
 
-      <Box>
-        {/* inserting the question ID associated with the slide. using props */}
-        <Quiz Qid={media.slide[count].Qid} key={media.slide[count].Qid} />
-      </Box>
+      {/* inserting the question ID associated with the slide. using props */}
+      {media.slide[count].Qid && (
+        <Box>
+          <Quiz Qid={media.slide[count].Qid} key={media.slide[count].Qid} />
+        </Box>
+      )}
 
-      <hr />
       {/* Slide Screen */}
       <Box align="center" className={classes.buttonBox}>
         <Button
@@ -96,7 +124,7 @@ function MediaPage({ match }) {
           Previous
         </Button>
         <Box className={classes.counterBox} component="span">
-          {count} / {countMax}
+          {count + 1} / {countMax + 1}
         </Box>
         <Button
           onClick={arrowForwardClickHandle}

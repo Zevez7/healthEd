@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   FormControl,
   FormControlLabel,
@@ -6,8 +6,9 @@ import {
   Radio,
   Typography
 } from "@material-ui/core";
-import QData from "../Data/questionData.json";
+// import QData from "../Data/questionData.json";
 import { makeStyles } from "@material-ui/core/styles";
+import { QuestionContext } from "../App";
 
 const useStyles = makeStyles({
   question: {
@@ -31,6 +32,7 @@ const useStyles = makeStyles({
 
 function Quiz(props) {
   const classes = useStyles();
+  const questionCT = useContext(QuestionContext);
 
   const [correctAns, setCorrectAns] = useState(null);
   const [value, setValue] = useState("");
@@ -49,13 +51,21 @@ function Quiz(props) {
     setValue(item);
   };
 
-  // match the passed Qid prop from landing with the Qdata to get one item
-  const OneQ = QData && QData.find(item => item.Qid === props.Qid);
-  // console.log("props.Qid", props.Qid);
-  // console.log(OneQ);
+  // match the passed Qid prop from landing with the questionCT to get one item
+  const OneQ =
+    questionCT &&
+    questionCT.find(item => {
+      return item.id === props.Qid;
+    });
+
+  //****testing
+  console.log("questionCT", questionCT);
+
+  //****testing
+  console.log("OneQ", OneQ);
 
   // map through the oneQ choice to find the choices to map through it
-  const QChoice = OneQ.Choice.map((item, index) => (
+  const QChoice = OneQ.choices.map((item, index) => (
     <FormControlLabel
       key={index}
       value={item}
@@ -64,14 +74,14 @@ function Quiz(props) {
           color="primary"
           key={index}
           value={item}
-          onChange={e => checkCorrect(index, OneQ.Correct, item)}
+          onChange={e => checkCorrect(index, OneQ.answer, item)}
         />
       }
       label={item}
     />
   ));
 
-  // display logic for when correctAns is selected or not 
+  // display logic for when correctAns is selected or not
   let correctAnsDisplay;
 
   if (correctAns === true) {
@@ -95,7 +105,7 @@ function Quiz(props) {
     <div>
       <FormControl component="fieldset" className={classes.FormControl}>
         <Typography className={classes.question} variant="h6">
-          Q{props.Qid}. {OneQ.Question}
+          {OneQ.question}
         </Typography>
         {correctAnsDisplay}
         <RadioGroup

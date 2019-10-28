@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Paper, TextField, Box, Typography, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { auth } from "../Components/Firebase";
+import { Redirect } from "react-router";
 
 const useStyles = makeStyles({
   Box: {
@@ -27,55 +29,100 @@ const useStyles = makeStyles({
   Button: {
     backgroundColor: "white",
     marginTop: 40
+  },
+  ErrorMessage: {
+    height: 30,
+    color: "red",
+    paddingTop: 5
   }
 });
 
 function SignUp() {
   const classes = useStyles();
 
-  const [values, setEmail] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [redirect, setRedirect] = useState(false);
+
+  const handleSubmit = e => {
+    e.preventDefault();
+
+    var registrationInfo = {
+      email: email,
+      password: password
+    };
+
+    auth
+      .createUserWithEmailAndPassword(
+        registrationInfo.email,
+        registrationInfo.password
+      )
+      .then(() => {
+        setErrorMessage(null);
+        setPassword("");
+        setEmail("");
+        setRedirect(true);
+      })
+      .catch(error => {
+        if (error.message !== null) {
+          setErrorMessage(error.message);
+        } else {
+          setErrorMessage(null);
+        }
+      });
+  };
 
   return (
     <div>
-      <Box className={classes.Box}>
-        <Paper className={classes.Paper}>
-          <Box>
-            <Typography variant="h3" className={classes.Title}>
-              SIGNUP
-            </Typography>
-          </Box>
+      {redirect && <Redirect to="/" />}
 
-          <TextField
-            label="Email Address"
-            // className={classes.textField}
-            className={classes.TextField}
-            value={values}
-            onChange={e => setEmail(e.target.value)}
-            margin="normal"
-            variant="outlined"
-          />
-          <br />
-          <TextField
-            label="Password"
-            // className={classes.textField}
-            className={classes.TextField}
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            margin="normal"
-            variant="outlined"
-          />
-          <Box>
-            <Button
+      <Box className={classes.Box}>
+        <form onSubmit={handleSubmit}>
+          <Paper className={classes.Paper}>
+            <Box>
+              <Typography variant="h3" className={classes.Title}>
+                SIGNUP
+              </Typography>
+            </Box>
+
+            <TextField
+              label="Email Address"
+              // className={classes.textField}
+              className={classes.TextField}
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              margin="normal"
               variant="outlined"
-              color="primary"
-              size="large"
-              className={classes.Button}
-            >
-              Submit
-            </Button>
-          </Box>
-        </Paper>
+            />
+            <br />
+            <TextField
+              label="Password"
+              // className={classes.textField}
+              className={classes.TextField}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              margin="normal"
+              variant="outlined"
+              type="password"
+              autoComplete="current-password"
+            />
+            <Box className={classes.ErrorMessage}>
+              {errorMessage && errorMessage}
+            </Box>
+            <Box>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="large"
+                type="submit"
+                className={classes.Button}
+              >
+                Submit
+              </Button>
+            </Box>
+          </Paper>
+        </form>
       </Box>
     </div>
   );

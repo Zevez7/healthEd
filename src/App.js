@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import React, { useEffect, useState, createContext } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.css";
-// import { db } from "../src/Components/Firebase";
+import { db, auth } from "../src/Components/Firebase";
 
 // component
 import NavBar from "./Components/NavBar";
 import ScrollToTop from "./Components/ScrollToTop";
 
 // data
-import QData from "./Data/questionData.json";
+// import QData from "./Data/questionData.json";
 
 // pages
 import Landing from "./Pages/Landing";
@@ -18,137 +18,134 @@ import SignUp from "./Pages/SignUp";
 import MediaPage from "./Pages/MediaPage";
 import Submit from "./Pages/Submit";
 import Progress from "./Pages/Progress";
+import Library from "./Pages/Library";
 
-import {
-  Container,
-  ListItemText,
-  ListItemIcon,
-  ListItem,
-  // Divider,
-  List,
-  // Button,
-  Drawer
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Container } from "@material-ui/core";
 
-// icon import
-import TrendingUpIcon from "@material-ui/icons/TrendingUp";
-import HomeIcon from "@material-ui/icons/Home";
-import PersonIcon from "@material-ui/icons/Person";
-
-const useStyles = makeStyles({
-  list: {
-    width: 250
-  },
-  fullList: {
-    width: "auto"
-  }
-});
+// context exporter
+export const UserContext = createContext();
+export const MediaContext = createContext();
+export const QuestionContext = createContext();
 
 function App() {
-  const classes = useStyles();
-  const [drawer, setDrawer] = useState({
-    left: false
-  });
-  const [quizData, setQuizData] = useState([]);
-
+  const [questionData, setQuestionData] = useState([]);
   useEffect(() => {
-    // storing setQuizData as state
-    // this will allow data to be send down the component tree to
-    setQuizData(QData);
-
-    // empty array for second paramater will mean that useEffect
-    // hook will only be called once right after initial rendering
+    const questionUnsubscribe = db
+      .collection("questions")
+      .onSnapshot(snapshot => {
+        let data = [];
+        snapshot.docs.forEach(doc => data.push({ ...doc.data(), id: doc.id }));
+        setQuestionData(data);
+        console.log("questions-data", data); // array of objects
+      });
+    return () => questionUnsubscribe();
   }, []);
 
-  console.log(quizData);
-  // const [dataReturn, setDataReturn] = useState([]);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // User is signed in.
+        var displayName = user.displayName;
+        var email = user.email;
+        var uid = user.uid;
+        var providerData = user.providerData;
+        setUser(user);
+        //****testing
+        console.log("user", user);
+        // ...
+      } else {
+        // User is signed out.
+        // ...
+      }
+      console.log("displayName", displayName);
+      //****testing
+      console.log("email", email);
+      //****testing
+      console.log("uid", uid);
+      //****testing
+      console.log("providerData", providerData);
+    });
+  }, []);
 
-  // parameter is passed after every render & update
-  // useEffect(() => {
-  //   db.collection("users")
-  //     .get()
-  //     .then(snapshot => {
-  //       let data = [];
-  //       snapshot.docs.forEach(doc => data.push({ ...doc.data(), id: doc.id }));
-  //       console.log(data); // array of cities objects
-  //       setDataReturn(data);
-  //     });
+  const [dataReturn, setDataReturn] = useState([]);
+  useEffect(
+    () => {
+      const unsubscribe = db.collection("media").onSnapshot(snapshot => {
+        let data = [];
+        snapshot.docs.forEach(doc => data.push({ ...doc.data(), id: doc.id }));
+        setDataReturn(data);
+        console.log("firebase-data", data); // array of objects
+      });
+      return () => unsubscribe();
+    },
+    // adding an empty [] array for the 2nd variable will prevent
+    // updating of dataReturn from passing after every render
+    // this will only fetch data on mounting of the component
 
-  // adding an empty [] array for the 2nd variable will prevent
-  // updating of dataReturn from passing after every render
-  // this will only fetch data on mounting of the component
-  // }, []);
-
-  // console.log(dataReturn);
-
-  // useEffect runs side effect based on certain parameter
-  // useEffect will run after every render and update
-
-  const toggleDrawer = (side, open) => event => {
-    if (
-      event.type === "keydown" &&
-      (event.key === "Tab" || event.key === "Shift")
-    ) {
-      return;
-    }
-
-    setDrawer({ ...drawer, [side]: open });
-  };
-
-  const sideBarLink = [
-    { name: "HEALTHED", icon: <HomeIcon />, link: "/" },
-    { name: "PPROGRESS", icon: <TrendingUpIcon />, link: "/progress" },
-    { name: "ACCOUNT", icon: <PersonIcon />, link: "/account" }
-  ];
-
-  const sideList = side => (
-    <div
-      className={classes.list}
-      role="presentation"
-      onClick={toggleDrawer(side, false)}
-      onKeyDown={toggleDrawer(side, false)}
-    >
-      <List>
-        {sideBarLink.map((item, index) => (
-          <>
-            <Link to={item.link} key={`${item}-${index}`}>
-              <ListItem button key={item.name}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.name} />
-              </ListItem>
-            </Link>
-          </>
-        ))}
-      </List>
-    </div>
+    // if component is unmounted, it will remove the db connection
+    // however this is the main app, so db connection will not unmount probably
+    []
   );
+
+  const authLogOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        console.log("sign-out successful");
+        setUser(null);
+      })
+      .catch(() => {
+        console.log("sign-out NOT successful");
+      });
+  };
 
   return (
     <div className="App">
       <Router>
         <ScrollToTop>
-          <NavBar toggleDrawerOpen={toggleDrawer} />
-          <Drawer open={drawer.left} onClose={toggleDrawer("left", false)}>
-            {sideList("left")}
-          </Drawer>{" "}
-          <Container align="left">
-            <Switch>
-              <Route exact path="/" render={props => <Landing />} />
-              <Route path="/mediapage/:mediaId" component={MediaPage} />
-              <Route path="/login" component={Login} />
-              <Route path="/signup" component={SignUp} />
-              <Route
-                path="/submit"
-                render={props => <Submit {...props} quizData={quizData} />}
-              />
-              <Route path="/account" render={props => <Account {...props} />} />
-              <Route
-                path="/progress"
-                render={props => <Progress {...props} />}
-              />
-            </Switch>
-          </Container>
+          <UserContext.Provider value={user}>
+            <MediaContext.Provider value={dataReturn}>
+              <QuestionContext.Provider value={questionData}>
+                <NavBar authLogOut={authLogOut} />
+                <Container align="left">
+                  <Switch>
+                    <Route
+                      exact
+                      path="/"
+                      render={props => <Landing {...props} />}
+                    />
+                    <Route
+                      path="/mediapage/:mediaId"
+                      render={props => <MediaPage {...props} />}
+                    />
+                    <Route path="/login" component={Login} />
+                    <Route path="/signup" component={SignUp} />
+                    <Route
+                      path="/submit"
+                      render={props => <Submit {...props} />}
+                    />
+                    <Route
+                      path="/account"
+                      render={props => <Account {...props} />}
+                    />
+                    <Route
+                      path="/progress"
+                      render={props => (
+                        <Progress {...props} dataReturn={dataReturn} />
+                      )}
+                    />{" "}
+                    <Route
+                      path="/library"
+                      render={props => (
+                        <Library {...props} dataReturn={dataReturn} />
+                      )}
+                    />
+                  </Switch>
+                </Container>
+              </QuestionContext.Provider>
+            </MediaContext.Provider>
+          </UserContext.Provider>
         </ScrollToTop>
       </Router>
     </div>

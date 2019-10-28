@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Grid, TextField } from "@material-ui/core/";
 import ThumbUnit from "../Components/ThumbUnit";
-import TestData from "../Data/testData.json";
-import { makeStyles } from "@material-ui/core/styles";
 
-// import { Route } from "react-router-dom";
-// import MediaPage from "../Pages/MediaPage";
+import { makeStyles } from "@material-ui/core/styles";
+import { MediaContext } from "../App";
 
 const useStyles = makeStyles({
   Spacing: {
@@ -18,20 +16,23 @@ const useStyles = makeStyles({
 
 function Landing() {
   const classes = useStyles();
+  const mediaCT = useContext(MediaContext);
 
   const [searchValue, setSearchValue] = useState("");
-  const [filteredTestData, setFilteredTestData] = useState(TestData);
+  const [filteredData, setFilteredData] = useState(mediaCT);
 
   // useEffect is rendered every time searchValue state is changed
-  // this is considered to be a callback effect to setFilteredTestData
+  // this is considered to be a callback effect to setFilteredData
   useEffect(() => {
-    let filtered = TestData.filter(data => {
+    let filtered = mediaCT.filter(data => {
       return data.title.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1;
     });
-    setFilteredTestData(filtered);
+    setFilteredData(filtered);
     console.log("useEffect run");
-  }, [searchValue]);
+  }, [searchValue, mediaCT]);
 
+  console.log("landing dataReturn", mediaCT);
+  console.log("filteredData", filteredData);
   return (
     <div>
       <Box className={classes.Spacing} />
@@ -47,11 +48,11 @@ function Landing() {
       </Box>
       <Box>
         <Grid container spacing={2} alignItems="center">
-          {filteredTestData.map((item, key) => (
+          {filteredData.map((item, key) => (
             <ThumbUnit
               key={key}
               title={item.title}
-              body={item.body}
+              body={item.info}
               id={item.id}
             />
           ))}

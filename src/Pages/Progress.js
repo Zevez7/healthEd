@@ -22,8 +22,8 @@ function Progress() {
   const jasonData = UserData.find(item => item.name.toLowerCase() === "jason");
   // console.log(jasonData);
 
-  // return the matched array and access the media for the user
-  // this is an array of object MediaArray
+  // return the matched array and access the media obj that is stored in the userData
+  // MediaArray is an array of obj with key progress/id
   let userMediaArray = [];
   for (const t in jasonData.media) {
     userMediaArray.push(jasonData.media[t]);
@@ -34,16 +34,16 @@ function Progress() {
   let userFilteredTestData = [];
 
   // this will loop through userMediaArray and use TestData.filter to only
-  // return mediaData array that matches userMediaArray id
+  // return mediaData array that matches userMediaArray id key
   for (let x in userMediaArray) {
     const filteredTestData = TestData.filter(item => {
       // userMediaArray is a string and not a number, you need to parseInt to get number
       return parseInt(userMediaArray[x].id) === item.id;
     });
     // map through the array of each media object
-    // add progress & maxSlide key/value
+    // add progress & maxSlide key/value to the media obj
     const addprogress = filteredTestData.map(item => {
-      // set the max slideCount by getting the keys for all slide
+      // set the max slideCount by getting the obj.keys for all slide
       item.maxSlide = Object.keys(item.slide).length;
       item.progress = parseInt(userMediaArray[x].progress);
       return item;

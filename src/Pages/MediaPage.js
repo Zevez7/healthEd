@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Box, Typography, Paper, Button } from "@material-ui/core";
-import ArrowBack from "@material-ui/icons/KeyboardArrowLeft";
-import ArrowForward from "@material-ui/icons/KeyboardArrowRight";
+
 import { makeStyles } from "@material-ui/core/styles";
 import Quiz from "../Components/Quiz.js";
-import { MediaContext } from "../App";
+import { db } from "../Components/Firebase";
+
+import { MediaContext, UserContext } from "../App";
+// icons
+import ArrowBack from "@material-ui/icons/KeyboardArrowLeft";
+import ArrowForward from "@material-ui/icons/KeyboardArrowRight";
+import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 
 const useStyles = makeStyles({
   title: { padding: 10 },
@@ -38,6 +43,12 @@ const useStyles = makeStyles({
   counterBox: {
     paddingLeft: 20,
     paddingRight: 20
+  },
+  Bookmark: {
+    float: "right"
+  },
+  BookMarkIcon: {
+    fontSize: 30
   }
 });
 
@@ -45,6 +56,7 @@ function MediaPage(props) {
   const classes = useStyles();
 
   const mediaCT = useContext(MediaContext);
+  const userCT = useContext(UserContext);
 
   // data is populated by props passed down and match with url parameter mediaId and filtered
   // media var will be set first
@@ -60,26 +72,38 @@ function MediaPage(props) {
       ? mediaCT.find(item => item.id.toString() === props.match.params.mediaId)
       : mediaLS;
 
-  //****testing
-  console.log("mediaCT", mediaCT);
-  console.log("media", media);
-
+  //store filtered media to localStorage called mediaLS
+  //when media changes, store a new localStorage with useEffect
   useEffect(() => {
-    //store filtered media to localStorage called mediaLS
-    //when media changes, store a new localStorage with useEffect
     localStorage.setItem("mediaLS", JSON.stringify(media));
     console.log("useEffect mediaLS");
   }, [media]);
 
   console.log("media after useEffect", media);
 
-  //****testing
-  // console.log("mediaState", mediaState);
-
   // setting state for slide count to display
-  const [count, setCount] = useState(0);
+  // props.match.params.slide returns a string,
+  // must subtract 1 to get num for count array index
+  const [count, setCount] = useState(
+    parseInt(props.match.params.slide).isInteger
+      ? parseInt(props.match.params.slide) - 1
+      : 0
+  );
+
+  //****testing
+  console.log("props.match.params.slide", parseInt(props.match.params.slide));
 
   const countMax = Object.keys(media.slide).length - 1;
+
+  const saveProgress = () => {
+    // update will create a new Mid object if there isn't anyone
+    // and will overwrite if the Mid object if there is one
+    db.collection(`users`)
+      .doc(userCT.uid)
+      .update({
+        [`savedMedia.${media.id}`]: { slide: count + 1, name: media.title }
+      });
+  };
 
   // logic to disable to show back arrow and front arrow
   const disableBack = () => (count === 0 ? true : false);
@@ -93,11 +117,21 @@ function MediaPage(props) {
   const arrowForwardClickHandle = () => {
     setCount(count + 1);
   };
+  //****testing
+  console.log("media.slide[count].Qid", media.slide[count].Qid);
 
   return (
     <>
       <div className={classes.h100} />
       <Box className={classes.title}>
+        <Box className={classes.Bookmark}>
+          {userCT && (
+            <Button onClick={() => saveProgress()} size="large">
+              <BookmarkBorderIcon className={classes.BookMarkIcon} /> Save
+              Progress
+            </Button>
+          )}
+        </Box>
         <Typography variant="h4">{media.title}</Typography>
       </Box>
       <Paper className={classes.placeholder}>

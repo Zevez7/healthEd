@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Paper, TextField, Box, Typography, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { auth } from "../Components/Firebase";
+import { auth, db } from "../Components/Firebase";
 import { Redirect } from "react-router";
 
 const useStyles = makeStyles({
@@ -62,6 +62,20 @@ function SignUp() {
         setErrorMessage(null);
         setPassword("");
         setEmail("");
+        const userId = auth.currentUser.uid;
+        return userId;
+      })
+      .then(userId => {
+        // create a user profile in the database
+
+        db.collection(`users`)
+          .doc(userId)
+          .set({
+            username: userId,
+            savedMedia: "testing"
+          });
+      })
+      .then(() => {
         setRedirect(true);
       })
       .catch(error => {

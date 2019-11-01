@@ -95,8 +95,8 @@ export default function FormDialog(props) {
         choices: choices
       })
       .then(docRef => {
-        // find the array element from the mediaCT list that matches props.slideId
-        let media = mediaCT.find(item => item.id.toString() === props.slideId);
+        // find the array element from the mediaCT list that matches props.Mid
+        let media = mediaCT.find(item => item.id.toString() === props.Mid);
 
         // go in and add the new Qid in the slide object array of the media element array
         media.slide[props.index].Qid = docRef.id;
@@ -104,10 +104,16 @@ export default function FormDialog(props) {
         // now reinsert the media.slide with the new Qid as whole to the database
 
         db.collection("media")
-          .doc(props.slideId)
+          .doc(props.Mid)
           .update({
             slide: media.slide
           });
+      })
+      .then(() => {
+        console.log("Firebase Add Question");
+      })
+      .catch(error => {
+        console.error("Firebase Add Question error:", error);
       });
 
     setQuestion("");
@@ -122,7 +128,7 @@ export default function FormDialog(props) {
   };
 
   //****testing
-  console.log("props.slideId", props.slideId);
+  console.log("props.Mid", props.Mid);
 
   //****testing
   console.log("props.index", props.index);
@@ -182,6 +188,7 @@ export default function FormDialog(props) {
               variant="outlined"
               fullWidth
               onChange={handleQuestionChange}
+              required
             />
 
             <TextField
@@ -199,7 +206,7 @@ export default function FormDialog(props) {
               helperText="Please Select The Correct Choice"
               margin="dense"
               variant="outlined"
-              required={true}
+              required
             >
               {choices.map((item, index) => (
                 <MenuItem key={index} value={index}>
@@ -230,6 +237,7 @@ export default function FormDialog(props) {
                     margin="dense"
                     variant="outlined"
                     fullWidth
+                    required
                   />
 
                   <br />

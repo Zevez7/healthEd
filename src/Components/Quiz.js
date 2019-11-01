@@ -6,7 +6,6 @@ import {
   Radio,
   Typography
 } from "@material-ui/core";
-// import QData from "../Data/questionData.json";
 import { makeStyles } from "@material-ui/core/styles";
 import { QuestionContext } from "../App";
 
@@ -51,35 +50,40 @@ function Quiz(props) {
     setValue(item);
   };
 
+  //****testing
+  console.log("props.Qid", props.Qid);
+  //****testing
+  console.log("questionCT", questionCT);
+
   // match the passed Qid prop from landing with the questionCT to get one item
+  // empty [] is evaluated to true, must check length to check
   const OneQ =
-    questionCT &&
+    questionCT.length > 0 &&
     questionCT.find(item => {
       return item.id === props.Qid;
     });
 
   //****testing
-  console.log("questionCT", questionCT);
-
-  //****testing
   console.log("OneQ", OneQ);
 
   // map through the oneQ choice to find the choices to map through it
-  const QChoice = OneQ.choices.map((item, index) => (
-    <FormControlLabel
-      key={index}
-      value={item}
-      control={
-        <Radio
-          color="primary"
-          key={index}
-          value={item}
-          onChange={e => checkCorrect(index, OneQ.answer, item)}
-        />
-      }
-      label={item}
-    />
-  ));
+  const QChoice =
+    OneQ.choices &&
+    OneQ.choices.map((item, index) => (
+      <FormControlLabel
+        key={index}
+        value={item}
+        control={
+          <Radio
+            color="primary"
+            key={index}
+            value={item}
+            onChange={e => checkCorrect(index, OneQ.answer, item)}
+          />
+        }
+        label={item}
+      />
+    ));
 
   // display logic for when correctAns is selected or not
   let correctAnsDisplay;

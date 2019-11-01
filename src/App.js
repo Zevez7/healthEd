@@ -26,6 +26,7 @@ import { Container } from "@material-ui/core";
 export const UserContext = createContext();
 export const MediaContext = createContext();
 export const QuestionContext = createContext();
+export const UserDataContext = createContext();
 
 function App() {
   const [questionData, setQuestionData] = useState([]);
@@ -38,6 +39,7 @@ function App() {
         setQuestionData(data);
         console.log("questions-data", data); // array of objects
       });
+
     return () => questionUnsubscribe();
   }, []);
 
@@ -46,10 +48,10 @@ function App() {
     auth.onAuthStateChanged(user => {
       if (user) {
         // User is signed in.
-        var displayName = user.displayName;
-        var email = user.email;
-        var uid = user.uid;
-        var providerData = user.providerData;
+        // const displayName = user.displayName;
+        // const email = user.email;
+        // const uid = user.uid;
+        // const providerData = user.providerData;
         setUser(user);
         //****testing
         console.log("user", user);
@@ -58,13 +60,27 @@ function App() {
         // User is signed out.
         // ...
       }
-      console.log("displayName", displayName);
-      //****testing
-      console.log("email", email);
-      //****testing
-      console.log("uid", uid);
-      //****testing
-      console.log("providerData", providerData);
+    });
+  }, []);
+
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    auth.onAuthStateChanged(user => {
+      if (user != null) {
+        db.collection("users")
+          .doc(user.uid)
+          .get()
+          .then(doc => {
+            if (doc.exists) {
+              console.log("doc.data()", doc.data());
+              setUserData(doc.data());
+            } else {
+              console.log("doc do not exist");
+            }
+          });
+      } else {
+        console.log("user not found");
+      }
     });
   }, []);
 
@@ -107,42 +123,44 @@ function App() {
           <UserContext.Provider value={user}>
             <MediaContext.Provider value={dataReturn}>
               <QuestionContext.Provider value={questionData}>
-                <NavBar authLogOut={authLogOut} />
-                <Container align="left">
-                  <Switch>
-                    <Route
-                      exact
-                      path="/"
-                      render={props => <Landing {...props} />}
-                    />
-                    <Route
-                      path="/mediapage/:mediaId"
-                      render={props => <MediaPage {...props} />}
-                    />
-                    <Route path="/login" component={Login} />
-                    <Route path="/signup" component={SignUp} />
-                    <Route
-                      path="/submit"
-                      render={props => <Submit {...props} />}
-                    />
-                    <Route
-                      path="/account"
-                      render={props => <Account {...props} />}
-                    />
-                    <Route
-                      path="/progress"
-                      render={props => (
-                        <Progress {...props} dataReturn={dataReturn} />
-                      )}
-                    />{" "}
-                    <Route
-                      path="/library"
-                      render={props => (
-                        <Library {...props} dataReturn={dataReturn} />
-                      )}
-                    />
-                  </Switch>
-                </Container>
+                <UserDataContext.Provider value={userData}>
+                  <NavBar authLogOut={authLogOut} />
+                  <Container align="left">
+                    <Switch>
+                      <Route
+                        exact
+                        path="/"
+                        render={props => <Landing {...props} />}
+                      />
+                      <Route
+                        path="/mediapage/:mediaId/:slide?"
+                        render={props => <MediaPage {...props} />}
+                      />
+                      <Route path="/login" component={Login} />
+                      <Route path="/signup" component={SignUp} />
+                      <Route
+                        path="/submit"
+                        render={props => <Submit {...props} />}
+                      />
+                      <Route
+                        path="/account"
+                        render={props => <Account {...props} />}
+                      />
+                      <Route
+                        path="/progress"
+                        render={props => (
+                          <Progress {...props} dataReturn={dataReturn} />
+                        )}
+                      />{" "}
+                      <Route
+                        path="/library"
+                        render={props => (
+                          <Library {...props} dataReturn={dataReturn} />
+                        )}
+                      />
+                    </Switch>
+                  </Container>
+                </UserDataContext.Provider>
               </QuestionContext.Provider>
             </MediaContext.Provider>
           </UserContext.Provider>

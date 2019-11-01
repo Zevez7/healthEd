@@ -65,11 +65,18 @@ function Submit(props) {
   const addMedia = e => {
     e.preventDefault();
 
-    db.collection(`media`).add({
-      title: title,
-      info: info,
-      slide: slide
-    });
+    db.collection(`media`)
+      .add({
+        title: title,
+        info: info,
+        slide: slide
+      })
+      .then(() => {
+        console.log("Firebase Media add");
+      })
+      .catch(error => {
+        console.error("Firebase Media add error:", error);
+      });
 
     setTitle("");
     setInfo("");

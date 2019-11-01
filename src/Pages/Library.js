@@ -5,7 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import ExpPanel from "../Components/ExpPanel";
 import { MediaContext } from "../App";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles({
   root: {
     width: "100%"
   },
@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
   Panel: {
     marginBottom: 10
   }
-}));
+});
 
 const Library = () => {
   const classes = useStyles();

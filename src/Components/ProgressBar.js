@@ -38,7 +38,7 @@ function ProgressBar(props) {
 
   return (
     <div>
-      <Link to={`/mediapage/${props.id}`}>
+      <Link to={`/mediapage/${props.id}/${props.progress}`}>
         <Card className={classes.Card}>
           <CardActionArea className={classes.Unit}>
             <CardContent>

@@ -11,29 +11,24 @@ const useStyles = makeStyles({
 
 const QuestionExpPanel = props => {
   const classes = useStyles();
-
   const questionCT = useContext(QuestionContext);
 
-  //****testing
-  console.log("questionCT", questionCT);
-
+  // using the media question id from the slide to
+  // find the matching question from questionCT
   const OneQ = questionCT.find(item => {
     return item.id === props.Qid;
   });
 
-  //****testing
-  console.log("OneQ", OneQ);
-
   return (
     <div>
       <Typography>Question: {OneQ.question} </Typography>
-      <Typography> Answer: {OneQ.answer + 1} </Typography>
+      <Typography>Answer: {OneQ.answer + 1} </Typography>
       <Typography>
-        Choices:{" "}
+        Choices:
         {OneQ.choices.map((item, index) => {
           return (
             <Typography className={classes.ChoiceItem}>
-              #{index + 1} - {item}
+              {index + 1}. {item}
             </Typography>
           );
         })}

@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography } from "@material-ui/core";
 import ProgressBar from "../Components/ProgressBar";
 
-import TestData from "../Data/testData.json";
-import UserData from "../Data/userData.json";
+import { MediaContext, UserDataContext } from "../App";
 
 const useStyles = makeStyles({
   title: {
@@ -18,44 +17,40 @@ const useStyles = makeStyles({
 function Progress() {
   const classes = useStyles();
 
-  // find the array with the object that matches the email or name
-  const jasonData = UserData.find(item => item.name.toLowerCase() === "jason");
-  // console.log(jasonData);
+  const mediaCT = useContext(MediaContext);
+  const userDataCT = useContext(UserDataContext);
 
-  // return the matched array and access the media obj that is stored in the userData
-  // MediaArray is an array of obj with key progress/id
-  let userMediaArray = [];
-  for (const t in jasonData.media) {
-    userMediaArray.push(jasonData.media[t]);
-  }
-  // console.log("array", userMediaArray);
+  // get the Mid and put them into an array
+  let MediaArray = userDataCT && Object.keys(userDataCT.savedMedia);
 
-  // this array will hold the filtered media based on the userMediaArray
-  let userFilteredTestData = [];
+  const UserMediaData =
+    mediaCT &&
+    MediaArray &&
+    mediaCT.filter(item => MediaArray.includes(item.id));
 
-  // this will loop through userMediaArray and use TestData.filter to only
-  // return mediaData array that matches userMediaArray id key
-  for (let x in userMediaArray) {
-    const filteredTestData = TestData.filter(item => {
-      // userMediaArray is a string and not a number, you need to parseInt to get number
-      return parseInt(userMediaArray[x].id) === item.id;
-    });
-    // map through the array of each media object
-    // add progress & maxSlide key/value to the media obj
-    const addprogress = filteredTestData.map(item => {
-      // set the max slideCount by getting the obj.keys for all slide
-      item.maxSlide = Object.keys(item.slide).length;
-      item.progress = parseInt(userMediaArray[x].progress);
-      return item;
-    });
-    // console.log("addprogress", addprogress);
-    // console.log("filteredTestData", filteredTestData);
-
-    // push each addprogress array element to userFilteredTestData using spread operator
-    userFilteredTestData = [...userFilteredTestData, ...addprogress];
+  // adding progress properties by getting the slide number from userDataCT
+  // UserMediaData is directly mutated
+  for (let x in UserMediaData) {
+    // change dot notation into a variable and using brackets
+    const UserMediaID = UserMediaData[x].id;
+    UserMediaData[x].progress = userDataCT.savedMedia[UserMediaID].slide;
   }
 
-  console.log("userFilteredTestData", userFilteredTestData);
+  useEffect(() => {
+    for (let x in UserMediaData) {
+      // change dot notation into a variable and using brackets
+      const UserMediaID = UserMediaData[x].id;
+      UserMediaData[x].progress = userDataCT.savedMedia[UserMediaID].slide;
+    }
+  }, [UserMediaData, userDataCT, mediaCT]);
+
+  //****testing
+  console.log("MediaArray", MediaArray);
+
+  //****testing
+  console.log("UserMediaData", UserMediaData);
+  //****testing
+  console.log("userDataCT", userDataCT);
 
   return (
     <div>
@@ -64,16 +59,18 @@ function Progress() {
         PROGRESS
       </Typography>
       <Box className={classes.topSpacing}></Box>
-      {userFilteredTestData.map((item, index) => (
-        <ProgressBar
-          title={item.title}
-          body={item.body}
-          // length only accepts int value while progress/maxslide is a fraction
-          length={(item.progress / item.maxSlide) * 100}
-          id={item.id}
-          key={`${item}-${index}`}
-        />
-      ))}
+      {UserMediaData &&
+        UserMediaData.map((item, index) => (
+          <ProgressBar
+            title={item.title}
+            body={item.info}
+            // length only accepts int value while progress/maxslide is a fraction
+            length={(item.progress / item.slide.length) * 100}
+            id={item.id}
+            key={`${item}-${index}`}
+            progress={item.progress}
+          />
+        ))}
     </div>
   );
 }

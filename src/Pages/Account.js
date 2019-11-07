@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box, Paper, Button, Typography } from "@material-ui/core/";
 
 import { makeStyles } from "@material-ui/core/styles";
+import { UserContext, UserDataContext } from "../App";
 
 const useStyles = makeStyles({
   container: {
@@ -38,6 +39,24 @@ const useStyles = makeStyles({
 function Account() {
   const classes = useStyles();
 
+  const UserCT = useContext(UserContext);
+  const UserDataCT = useContext(UserDataContext);
+
+  //****testing
+  console.log("UserCT", UserCT);
+  //****testing
+  console.log("UserDataCT", UserDataCT);
+
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    if (UserDataCT) {
+      setUserName(UserDataCT.userName);
+      setEmail(UserDataCT.email);
+    }
+  }, [UserDataCT]);
+
   return (
     <div>
       <Box className={classes.topSpacing}></Box>
@@ -45,12 +64,12 @@ function Account() {
         ACCOUNT
       </Typography>
       <Paper className={classes.content}>
-        <Typography variant="h5">DATWestern</Typography>
+        <Typography variant="h5">{userName ? userName : "loading"}</Typography>
         <Typography variant="subtitle2">Username</Typography>
 
         <br />
-        <Typography variant="h5">Oksmuerhouse@gmail.com</Typography>
-        <Typography variant="subtitle2">Email</Typography>
+        <Typography variant="h5">{email ? email : "loading"}</Typography>
+        <Typography variant="subtitle2">Email Address</Typography>
 
         <br />
 

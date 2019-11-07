@@ -33,9 +33,12 @@ const useStyles = makeStyles({
   }
 });
 
+//****testing
+
 function ProgressBar(props) {
   const classes = useStyles();
 
+  console.log("props.progress", props.progress);
   return (
     <div>
       <Link to={`/mediapage/${props.id}/${props.progress}`}>

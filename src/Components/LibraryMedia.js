@@ -10,9 +10,10 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 // component
-import QuestionExpPanel from "./QuestionExpPanel";
-import QuestionModal from "../Components/QuestionModal";
-import DeleteQuestion from "../Components/DeleteQuestion";
+import LibraryQuestion from "./LibraryQuestion";
+import QuestionModal from "./QuestionModal";
+import DeleteQuestion from "./DeleteQuestion";
+import DeleteMedia from "./DeleteMedia";
 
 import { makeStyles } from "@material-ui/core/styles";
 // import { QuestionContext } from "../App";
@@ -39,7 +40,6 @@ const useStyles = makeStyles({
 
 const ExpPanel = props => {
   const classes = useStyles();
-  // const questionCT = useContext(QuestionContext);
 
   // check to see if Media Qid exist in QuestionCT
 
@@ -57,6 +57,11 @@ const ExpPanel = props => {
         <ExpansionPanelDetails className={classes.Details}>
           <Typography variant="body1">ID: {props.id}</Typography>
           <Typography variant="body1">Info: {props.info}</Typography>
+          <DeleteMedia
+            Id={props.id}
+            handleSnackBarOpen={props.handleSnackBarOpen}
+          />
+
           <Box className={classes.Spacer}></Box>
 
           {props.slide &&
@@ -77,11 +82,12 @@ const ExpPanel = props => {
                       {item.Qid ? (
                         <>
                           QID - {item.Qid}
-                          <QuestionExpPanel Qid={item.Qid} />
+                          <LibraryQuestion Qid={item.Qid} />
                           <DeleteQuestion
                             Qid={item.Qid}
                             Mid={props.id}
                             index={index}
+                            handleSnackBarOpen={props.handleSnackBarOpen}
                           />
                         </>
                       ) : (

@@ -1,9 +1,16 @@
 import React, { useState, useContext } from "react";
-import { Paper, TextField, Box, Typography, Button } from "@material-ui/core";
+import {
+  Paper,
+  TextField,
+  Box,
+  Typography,
+  Button,
+  Snackbar
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { db } from "../Components/Firebase";
-import { UserContext } from "../App";
-
+import useSnackBar from "../Hooks/useSnackBar";
+import { UserDataContext } from "../App";
 // styling
 const useStyles = makeStyles({
   Box: {
@@ -42,25 +49,49 @@ const useStyles = makeStyles({
   },
   QTypo: {
     fontSize: "0.7rem"
+  },
+  SnackbarSuccessful: {
+    backgroundColor: "#4CAF50",
+    color: "white"
   }
 });
 
-function Submit(props) {
+function Submit() {
   const classes = useStyles();
-  const userCT = useContext(UserContext);
+  const userDataCT = useContext(UserDataContext);
 
-  // useEffect(() => {
+  // custom snackBar Hook array destructuring
+  const [
+    handleSnackBarOpen,
+    handleSnackBarClose,
+    stateSnackBar,
+    stringMessage
+  ] = useSnackBar("Media Successfully Added");
 
-  // }, []);
+  // custom snackBar Hook object destructuring
+  const { vertical, horizontal, open } = stateSnackBar;
 
-  //****testing
-  console.log("userCT", userCT);
-  // const [title, setTitle] = useState({ title: "" });
+  const SnackBarElement = (
+    <Snackbar
+      anchorOrigin={{ vertical, horizontal }}
+      key={`${vertical},${horizontal}`}
+      open={open}
+      onClose={handleSnackBarClose}
+      ContentProps={{
+        "aria-describedby": "message-id",
+        classes: { root: classes.SnackbarSuccessful }
+      }}
+      message={<span id="message-id">{stringMessage}</span>}
+    />
+  );
+
   const [title, setTitle] = useState("");
   const [info, setInfo] = useState("");
 
   const handleTitleChange = e => setTitle((e.target.name = e.target.value));
   const handleInfoChange = e => setInfo((e.target.name = e.target.value));
+
+  const username = userDataCT && userDataCT.userName;
 
   const addMedia = e => {
     e.preventDefault();
@@ -69,18 +100,19 @@ function Submit(props) {
       .add({
         title: title,
         info: info,
-        slide: slide
+        slide: slide,
+        username: username
       })
       .then(() => {
+        setTitle("");
+        setInfo("");
+        setSlide([]);
+        handleSnackBarOpen();
         console.log("Firebase Media add");
       })
       .catch(error => {
         console.error("Firebase Media add error:", error);
       });
-
-    setTitle("");
-    setInfo("");
-    setSlide([]);
   };
 
   // object with a key of slide and a value of " "
@@ -123,9 +155,11 @@ function Submit(props) {
 
   console.log("slide", slide);
 
-  console.log("passedApp quizData", props.quizData);
   return (
     <>
+      {/* custom snackbar hook */}
+      {SnackBarElement}
+
       <Box className={classes.Box}>
         <Paper className={classes.Paper}>
           <Box>
@@ -168,7 +202,7 @@ function Submit(props) {
               //  mapping create a new const slideId from the index value of the map
               const slideId = `slide-${idx}`;
               return (
-                <>
+                <div key={`slide-${idx}`}>
                   <TextField
                     key={`slide-${idx}`}
                     label={`Slide #${idx + 1}`}
@@ -192,7 +226,7 @@ function Submit(props) {
                   />
 
                   <br />
-                </>
+                </div>
               );
             })}
 

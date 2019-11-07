@@ -7,9 +7,6 @@ import { db, auth } from "../src/Components/Firebase";
 import NavBar from "./Components/NavBar";
 import ScrollToTop from "./Components/ScrollToTop";
 
-// data
-// import QData from "./Data/questionData.json";
-
 // pages
 import Landing from "./Pages/Landing";
 import Account from "./Pages/Account";
@@ -30,6 +27,7 @@ export const UserDataContext = createContext();
 
 function App() {
   const [questionData, setQuestionData] = useState([]);
+  
   useEffect(() => {
     const questionUnsubscribe = db
       .collection("questions")
@@ -37,7 +35,6 @@ function App() {
         let data = [];
         snapshot.docs.forEach(doc => data.push({ ...doc.data(), id: doc.id }));
         setQuestionData(data);
-        console.log("questions-data", data); // array of objects
       });
 
     return () => questionUnsubscribe();
@@ -57,8 +54,7 @@ function App() {
         console.log("user", user);
         // ...
       } else {
-        // User is signed out.
-        // ...
+        console.log("user not logged in");
       }
     });
   }, []);
@@ -69,10 +65,9 @@ function App() {
       if (user != null) {
         db.collection("users")
           .doc(user.uid)
-          .get()
-          .then(doc => {
+          .onSnapshot(doc => {
             if (doc.exists) {
-              console.log("doc.data()", doc.data());
+              console.log("User Data", doc.data());
               setUserData(doc.data());
             } else {
               console.log("doc do not exist");
@@ -133,7 +128,7 @@ function App() {
                         render={props => <Landing {...props} />}
                       />
                       <Route
-                        path="/mediapage/:mediaId/:slide?"
+                        path="/mediapage/:mediaId/:slideNum?"
                         render={props => <MediaPage {...props} />}
                       />
                       <Route path="/login" component={Login} />

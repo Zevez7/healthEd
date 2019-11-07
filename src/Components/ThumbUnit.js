@@ -28,6 +28,9 @@ const useStyles = makeStyles({
   },
   box: {
     textAlign: "left"
+  },
+  username: {
+    height: 30
   }
 });
 
@@ -59,8 +62,8 @@ function ThumbUnit(props) {
             </Link>
 
             <CardActions>
-              <Button size="small" color="primary">
-                Username
+              <Button size="small" className={classes.username}>
+                {props.username}
               </Button>
             </CardActions>
           </Card>

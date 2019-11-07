@@ -18,8 +18,9 @@ const useStyles = makeStyles({
     backgroundColor: "whitesmoke"
   },
   TextField: {
-    marginTop: 30,
-    backgroundColor: "white"
+    marginTop: 20,
+    backgroundColor: "white",
+    minWidth: 300
   },
 
   Title: {
@@ -40,6 +41,7 @@ const useStyles = makeStyles({
 function SignUp() {
   const classes = useStyles();
 
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
@@ -66,13 +68,13 @@ function SignUp() {
         return userId;
       })
       .then(userId => {
-        // create a user profile in the database
+        // create a user profile in the database/users
 
         db.collection(`users`)
           .doc(userId)
           .set({
-            username: userId,
-            savedMedia: "testing"
+            userName,
+            email
           });
       })
       .then(() => {
@@ -99,6 +101,16 @@ function SignUp() {
                 SIGNUP
               </Typography>
             </Box>
+
+            <TextField
+              label="Username"
+              className={classes.TextField}
+              value={userName}
+              onChange={e => setUserName(e.target.value)}
+              margin="normal"
+              variant="outlined"
+            />
+            <br />
 
             <TextField
               label="Email Address"

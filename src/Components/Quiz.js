@@ -50,11 +50,6 @@ function Quiz(props) {
     setValue(item);
   };
 
-  //****testing
-  console.log("props.Qid", props.Qid);
-  //****testing
-  console.log("questionCT", questionCT);
-
   // match the passed Qid prop from landing with the questionCT to get one item
   // empty [] is evaluated to true, must check length to check
   const OneQ =
@@ -62,9 +57,6 @@ function Quiz(props) {
     questionCT.find(item => {
       return item.id === props.Qid;
     });
-
-  //****testing
-  console.log("OneQ", OneQ);
 
   // map through the oneQ choice to find the choices to map through it
   const QChoice =

@@ -16,6 +16,8 @@ const useStyles = makeStyles({
 
 function Landing() {
   const classes = useStyles();
+  
+  // mediaCT is data pulled from app
   const mediaCT = useContext(MediaContext);
 
   const [searchValue, setSearchValue] = useState("");
@@ -28,11 +30,8 @@ function Landing() {
       return data.title.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1;
     });
     setFilteredData(filtered);
-    console.log("useEffect run");
   }, [searchValue, mediaCT]);
 
-  console.log("landing dataReturn", mediaCT);
-  console.log("filteredData", filteredData);
   return (
     <div>
       <Box className={classes.Spacing} />
@@ -54,6 +53,7 @@ function Landing() {
               title={item.title}
               body={item.info}
               id={item.id}
+              username={item.username}
             />
           ))}
         </Grid>

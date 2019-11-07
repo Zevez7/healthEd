@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Box, Typography, Paper, Button } from "@material-ui/core";
-
+import { Box, Typography, Paper, Button, Snackbar } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Quiz from "../Components/Quiz.js";
 import { db } from "../Components/Firebase";
-
+import useSnackBar from "../Hooks/useSnackBar";
 import { MediaContext, UserContext } from "../App";
+
 // icons
 import ArrowBack from "@material-ui/icons/KeyboardArrowLeft";
 import ArrowForward from "@material-ui/icons/KeyboardArrowRight";
@@ -49,6 +49,10 @@ const useStyles = makeStyles({
   },
   BookMarkIcon: {
     fontSize: 30
+  },
+  SnackbarSuccessful: {
+    backgroundColor: "#4CAF50",
+    color: "white"
   }
 });
 
@@ -58,13 +62,35 @@ function MediaPage(props) {
   const mediaCT = useContext(MediaContext);
   const userCT = useContext(UserContext);
 
+  // custom snackBar Hook array destructuring
+  const [
+    handleSnackBarOpen,
+    handleSnackBarClose,
+    stateSnackBar,
+    stringMessage
+  ] = useSnackBar("Progress Saved Successfully");
+
+  // custom snackBar Hook object destructuring
+  const { vertical, horizontal, open } = stateSnackBar;
+
+  const SnackBarElement = (
+    <Snackbar
+      anchorOrigin={{ vertical, horizontal }}
+      key={`${vertical},${horizontal}`}
+      open={open}
+      onClose={handleSnackBarClose}
+      ContentProps={{
+        "aria-describedby": "message-id",
+        classes: { root: classes.SnackbarSuccessful }
+      }}
+      message={<span id="message-id">{stringMessage}</span>}
+    />
+  );
+
   // data is populated by props passed down and match with url parameter mediaId and filtered
   // media var will be set first
   // changes in the media will cause useEffect to run
-
   const mediaLS = JSON.parse(localStorage.getItem("mediaLS"));
-  //****testing
-  console.log("mediaLS", mediaLS);
 
   // set media to passed mediaCT or mediaLS
   const media =
@@ -76,33 +102,28 @@ function MediaPage(props) {
   //when media changes, store a new localStorage with useEffect
   useEffect(() => {
     localStorage.setItem("mediaLS", JSON.stringify(media));
-    console.log("useEffect mediaLS");
   }, [media]);
-
-  console.log("media after useEffect", media);
 
   // setting state for slide count to display
   // props.match.params.slide returns a string,
   // must subtract 1 to get num for count array index
   const [count, setCount] = useState(
-    parseInt(props.match.params.slide).isInteger
-      ? parseInt(props.match.params.slide) - 1
+    parseInt(props.match.params.slideNum)
+      ? parseInt(props.match.params.slideNum) - 1
       : 0
   );
 
-  //****testing
-  console.log("props.match.params.slide", parseInt(props.match.params.slide));
-
   const countMax = Object.keys(media.slide).length - 1;
 
+  // update will create a new Mid object if there isn't anyone
+  // and will overwrite if the Mid object if there is one
   const saveProgress = () => {
-    // update will create a new Mid object if there isn't anyone
-    // and will overwrite if the Mid object if there is one
     db.collection(`users`)
       .doc(userCT.uid)
       .update({
         [`savedMedia.${media.id}`]: { slide: count + 1, name: media.title }
-      });
+      })
+      .then(() => handleSnackBarOpen());
   };
 
   // logic to disable to show back arrow and front arrow
@@ -117,11 +138,11 @@ function MediaPage(props) {
   const arrowForwardClickHandle = () => {
     setCount(count + 1);
   };
-  //****testing
-  console.log("media.slide[count].Qid", media.slide[count].Qid);
 
   return (
     <>
+      {/* custom snackbar hook */}
+      {SnackBarElement}
       <div className={classes.h100} />
       <Box className={classes.title}>
         <Box className={classes.Bookmark}>

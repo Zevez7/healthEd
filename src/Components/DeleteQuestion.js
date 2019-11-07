@@ -23,6 +23,7 @@ const DeleteQuestion = props => {
       .delete()
       .then(() => {
         console.log("Delete Qid from Question");
+        props.handleSnackBarOpen("Question Successfully Deleted");
       })
       .catch(error => {
         console.error("Error removing document: ", error);

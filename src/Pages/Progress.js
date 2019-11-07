@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography } from "@material-ui/core";
 import ProgressBar from "../Components/ProgressBar";
@@ -15,42 +15,38 @@ const useStyles = makeStyles({
 });
 
 function Progress() {
+  console.log("rendering");
+
   const classes = useStyles();
 
   const mediaCT = useContext(MediaContext);
   const userDataCT = useContext(UserDataContext);
 
-  // get the Mid and put them into an array
-  let MediaArray = userDataCT && Object.keys(userDataCT.savedMedia);
-
-  const UserMediaData =
-    mediaCT &&
-    MediaArray &&
-    mediaCT.filter(item => MediaArray.includes(item.id));
-
-  // adding progress properties by getting the slide number from userDataCT
-  // UserMediaData is directly mutated
-  for (let x in UserMediaData) {
-    // change dot notation into a variable and using brackets
-    const UserMediaID = UserMediaData[x].id;
-    UserMediaData[x].progress = userDataCT.savedMedia[UserMediaID].slide;
-  }
+  const [userMediaData, setUserMediaData] = useState(() => {
+    return localStorage.getItem("userMediaDataLS")
+      ? JSON.parse(localStorage.getItem("userMediaDataLS"))
+      : [];
+  });
 
   useEffect(() => {
-    for (let x in UserMediaData) {
-      // change dot notation into a variable and using brackets
-      const UserMediaID = UserMediaData[x].id;
-      UserMediaData[x].progress = userDataCT.savedMedia[UserMediaID].slide;
+    if (userDataCT && mediaCT) {
+      const MediaArray = Object.keys(userDataCT.savedMedia);
+      const userMediaDataTemp = mediaCT.filter(item =>
+        MediaArray.includes(item.id)
+      );
+
+      userMediaDataTemp.forEach(item => {
+        const UserMediaID = item.id;
+        item.progress = userDataCT.savedMedia[UserMediaID].slide;
+      });
+      setUserMediaData(userMediaDataTemp);
     }
-  }, [UserMediaData, userDataCT, mediaCT]);
+  }, [userDataCT, mediaCT]);
 
-  //****testing
-  console.log("MediaArray", MediaArray);
-
-  //****testing
-  console.log("UserMediaData", UserMediaData);
-  //****testing
-  console.log("userDataCT", userDataCT);
+  // LocalStorage
+  useEffect(() => {
+    localStorage.setItem("userMediaDataLS", JSON.stringify(userMediaData));
+  }, [userMediaData]);
 
   return (
     <div>
@@ -59,8 +55,8 @@ function Progress() {
         PROGRESS
       </Typography>
       <Box className={classes.topSpacing}></Box>
-      {UserMediaData &&
-        UserMediaData.map((item, index) => (
+      {userMediaData.length > 0 ? (
+        userMediaData.map((item, index) => (
           <ProgressBar
             title={item.title}
             body={item.info}
@@ -70,7 +66,10 @@ function Progress() {
             key={`${item}-${index}`}
             progress={item.progress}
           />
-        ))}
+        ))
+      ) : (
+        <Typography variant="body1">No media has been saved</Typography>
+      )}
     </div>
   );
 }

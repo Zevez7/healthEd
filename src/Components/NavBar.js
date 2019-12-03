@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { UserContext } from "../App";
+import { UserContext, UserDataContext } from "../App";
 
 import {
   AppBar,
@@ -25,6 +25,7 @@ import PersonIcon from "@material-ui/icons/Person";
 import MenuIcon from "@material-ui/icons/Menu";
 import AddIcon from "@material-ui/icons/Add";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -50,7 +51,8 @@ const useStyles = makeStyles({
   },
   addIcon: {
     backgroundColor: "#1976D2",
-    marginRight: 3
+    marginRight: 3,
+    color: "white"
   },
   Add: {
     marginRight: 5,
@@ -60,11 +62,21 @@ const useStyles = makeStyles({
   },
   Button: {
     fontSize: "1rem"
+  },
+  UserName: {
+    paddingLeft: 10,
+    paddingRight: 5,
+    fontSize: "1rem",
+    fontWeight: 500,
+    lineHeight: 1.75,
+    letterSpacing: "0.02857em",
+    textTransform: "uppercase"
   }
 });
 
 function NavBar(props) {
   const userCT = useContext(UserContext);
+  const userDataCT = useContext(UserDataContext);
 
   const classes = useStyles();
   // pass toggleDrawer open to Nav component
@@ -87,7 +99,8 @@ function NavBar(props) {
     { name: "HEALTHED", icon: <HomeIcon />, link: "/" },
     { name: "PPROGRESS", icon: <TrendingUpIcon />, link: "/progress" },
     { name: "ACCOUNT", icon: <PersonIcon />, link: "/account" },
-    { name: "LIBRARY", icon: <AttachFileIcon />, link: "/library" }
+    { name: "LIBRARY", icon: <AttachFileIcon />, link: "/library" },
+    { name: "MEDIA", icon: <PlayArrowIcon />, link: "/usermedia" }
   ];
 
   const sideNav = side => (
@@ -136,11 +149,11 @@ function NavBar(props) {
           </Typography>
 
           {userCT !== null ? (
-            <div>
+            <Box>
               <Box className={classes.Add}>
                 <Link to={"/submit"}>
                   <Fab
-                    color="inherit"
+                    color="secondary"
                     size="small"
                     aria-label="add"
                     className={classes.addIcon}
@@ -148,7 +161,11 @@ function NavBar(props) {
                     <AddIcon />
                   </Fab>
                 </Link>
+                <Typography display="inline" className={classes.UserName}>
+                  {userDataCT && userDataCT.userName}
+                </Typography>
               </Box>
+
               <Button
                 color="inherit"
                 onClick={() => {
@@ -158,7 +175,7 @@ function NavBar(props) {
               >
                 LOGOUT
               </Button>
-            </div>
+            </Box>
           ) : (
             <>
               <Link to={"/login"}>

@@ -1,18 +1,33 @@
 import React, { useContext } from "react";
-import { Button } from "@material-ui/core";
 
 import { db } from "../Components/Firebase";
 import { MediaContext } from "../App";
 import { makeStyles } from "@material-ui/core/styles";
+import ConfirmationDialogBox from "./ConfirmationDialogBox";
+import { QuestionContext } from "../App";
 
 const useStyles = makeStyles({
-  QuizButton: {
+  ChoiceButton: {
     backgroundColor: "white"
+  },
+  AlignRight: {
+    display: "flex",
+    justifyContent: "flex-end"
   }
 });
 
 const DeleteQuestion = props => {
   const classes = useStyles();
+  const questionCT = useContext(QuestionContext);
+
+  // using the media question id from the slide to
+  // find the matching question from questionCT
+  const OneQ = questionCT.find(item => {
+    return item.id === props.Qid;
+  });
+
+  //****testing
+  console.log("deletequestion rendering");
 
   const mediaCT = useContext(MediaContext);
 
@@ -61,26 +76,20 @@ const DeleteQuestion = props => {
     deleteQuestionDoc(Qid);
   };
 
-  //****testing
-  // console.log("OneMedia", OneMedia);
-  console.log("prop.Qid", props.Qid);
-  console.log("prop.Mid", props.Mid);
-  //****testing
-  console.log("props.index", props.index);
-  //****testing
-  console.log("mediaCT", mediaCT);
-
   return (
-    <div>
-      <Button
-        variant="outlined"
-        color="secondary"
-        size="small"
-        className={classes.ChoiceButton}
-        onClick={e => deleteQidHandler(props.Qid)}
-      >
-        Delete Question
-      </Button>
+    <div className={classes.AlignRight}>
+      <ConfirmationDialogBox
+        title={"Delete Confirmation"}
+        message={`Are you sure you want to delete? 
+        ${OneQ.question}`}
+        buttonText={"Delete Question"}
+        buttonColor={"Delete Question"}
+        cancel={"Cancel"}
+        cancelColor={"primary"}
+        accept={"Delete"}
+        acceptColor={"secondary"}
+        acceptFunction={() => deleteQidHandler(props.Qid)}
+      />
     </div>
   );
 };

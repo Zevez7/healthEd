@@ -16,6 +16,7 @@ import MediaPage from "./Pages/MediaPage";
 import Submit from "./Pages/Submit";
 import Progress from "./Pages/Progress";
 import Library from "./Pages/Library";
+import UserMedia from "./Pages/UserMedia";
 
 import { Container } from "@material-ui/core";
 
@@ -27,8 +28,17 @@ export const UserDataContext = createContext();
 
 function App() {
   const [questionData, setQuestionData] = useState([]);
-  
+  const [mediaData, setMediaData] = useState([]);
+  const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
+
+  console.log("app rendering");
+
+  // Effect only run once on initial render
   useEffect(() => {
+    console.log("Running initial useEffect");
+
+    // getting the questions from the database
     const questionUnsubscribe = db
       .collection("questions")
       .onSnapshot(snapshot => {
@@ -37,11 +47,14 @@ function App() {
         setQuestionData(data);
       });
 
-    return () => questionUnsubscribe();
-  }, []);
-
-  const [user, setUser] = useState(null);
-  useEffect(() => {
+    // getting media data from database
+    const mediaUnsubscribe = db.collection("media").onSnapshot(snapshot => {
+      let data = [];
+      snapshot.docs.forEach(doc => data.push({ ...doc.data(), id: doc.id }));
+      setMediaData(data);
+      console.log("firebase-data", data); // array of objects
+    });
+    // logging in user
     auth.onAuthStateChanged(user => {
       if (user) {
         // User is signed in.
@@ -50,17 +63,14 @@ function App() {
         // const uid = user.uid;
         // const providerData = user.providerData;
         setUser(user);
-        //****testing
         console.log("user", user);
-        // ...
+        console.log("user is logged in");
       } else {
         console.log("user not logged in");
       }
     });
-  }, []);
 
-  const [userData, setUserData] = useState(null);
-  useEffect(() => {
+    // getting the user's data if user is logged in
     auth.onAuthStateChanged(user => {
       if (user != null) {
         db.collection("users")
@@ -77,27 +87,14 @@ function App() {
         console.log("user not found");
       }
     });
+
+    return () => {
+      questionUnsubscribe();
+      mediaUnsubscribe();
+      //****testing
+      console.log("unsubscribe");
+    };
   }, []);
-
-  const [dataReturn, setDataReturn] = useState([]);
-  useEffect(
-    () => {
-      const unsubscribe = db.collection("media").onSnapshot(snapshot => {
-        let data = [];
-        snapshot.docs.forEach(doc => data.push({ ...doc.data(), id: doc.id }));
-        setDataReturn(data);
-        console.log("firebase-data", data); // array of objects
-      });
-      return () => unsubscribe();
-    },
-    // adding an empty [] array for the 2nd variable will prevent
-    // updating of dataReturn from passing after every render
-    // this will only fetch data on mounting of the component
-
-    // if component is unmounted, it will remove the db connection
-    // however this is the main app, so db connection will not unmount probably
-    []
-  );
 
   const authLogOut = () => {
     auth
@@ -116,7 +113,7 @@ function App() {
       <Router>
         <ScrollToTop>
           <UserContext.Provider value={user}>
-            <MediaContext.Provider value={dataReturn}>
+            <MediaContext.Provider value={mediaData}>
               <QuestionContext.Provider value={questionData}>
                 <UserDataContext.Provider value={userData}>
                   <NavBar authLogOut={authLogOut} />
@@ -144,13 +141,19 @@ function App() {
                       <Route
                         path="/progress"
                         render={props => (
-                          <Progress {...props} dataReturn={dataReturn} />
+                          <Progress {...props} mediaData={mediaData} />
                         )}
-                      />{" "}
+                      />
                       <Route
                         path="/library"
                         render={props => (
-                          <Library {...props} dataReturn={dataReturn} />
+                          <Library {...props} mediaData={mediaData} />
+                        )}
+                      />
+                      <Route
+                        path="/usermedia"
+                        render={props => (
+                          <UserMedia {...props} mediaData={mediaData} />
                         )}
                       />
                     </Switch>

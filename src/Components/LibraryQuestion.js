@@ -5,7 +5,7 @@ import { QuestionContext } from "../App";
 
 const useStyles = makeStyles({
   ChoiceItem: {
-    paddingLeft: 15
+    paddingLeft: 20
   }
 });
 
@@ -23,16 +23,14 @@ const QuestionExpPanel = props => {
     <div>
       <Typography>Question: {OneQ.question} </Typography>
       <Typography>Answer: {OneQ.answer + 1} </Typography>
-      <Typography>
-        Choices:
-        {OneQ.choices.map((item, index) => {
-          return (
-            <Typography className={classes.ChoiceItem}>
-              {index + 1}. {item}
-            </Typography>
-          );
-        })}
-      </Typography>
+      Choices:
+      {OneQ.choices.map((item, index) => {
+        return (
+          <Typography className={classes.ChoiceItem} key={item + index}>
+            {index + 1}. {item}
+          </Typography>
+        );
+      })}
     </div>
   );
 };

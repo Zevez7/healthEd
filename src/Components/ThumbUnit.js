@@ -6,7 +6,6 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
-  CardMedia,
   Button,
   Typography
 } from "@material-ui/core";
@@ -45,17 +44,10 @@ function ThumbUnit(props) {
             {/* add the props.id to pass it to the linked page with react router */}
             <Link to={`/mediapage/${props.id}`}>
               <CardActionArea>
-                <CardMedia
-                  className={classes.media}
-                  image="/static/images/cards/contemplative-reptile.jpg"
-                  title="Contemplative Reptile"
-                />
+                <Box className={classes.media} title="no media" />
                 <CardContent>
                   <Typography gutterBottom variant="h5">
                     {props.title}
-                  </Typography>
-                  <Typography variant="body2" color="textPrimary" component="p">
-                    {props.body}
                   </Typography>
                 </CardContent>
               </CardActionArea>

@@ -11,6 +11,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import { db } from "../Components/Firebase";
 import useSnackBar from "../Hooks/useSnackBar";
 import { UserDataContext } from "../App";
+
+import { DateTime } from "luxon";
+
 // styling
 const useStyles = makeStyles({
   Box: {
@@ -59,7 +62,6 @@ const useStyles = makeStyles({
 function Submit() {
   const classes = useStyles();
   const userDataCT = useContext(UserDataContext);
-
   // custom snackBar Hook array destructuring
   const [
     handleSnackBarOpen,
@@ -93,6 +95,10 @@ function Submit() {
 
   const username = userDataCT && userDataCT.userName;
 
+  // luxon, add a iso timestamp 
+  const now = DateTime.local().toISO();
+
+
   const addMedia = e => {
     e.preventDefault();
 
@@ -101,7 +107,8 @@ function Submit() {
         title: title,
         info: info,
         slide: slide,
-        username: username
+        username: username,
+        date: now
       })
       .then(() => {
         setTitle("");

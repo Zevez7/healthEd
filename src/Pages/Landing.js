@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { Box, Grid, TextField } from "@material-ui/core/";
 import ThumbUnit from "../Components/ThumbUnit";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { MediaContext } from "../App";
+import useSearchBar from "./../Hooks/useSearchBar";
 
 const useStyles = makeStyles({
   Spacing: {
@@ -16,38 +17,36 @@ const useStyles = makeStyles({
 
 function Landing() {
   const classes = useStyles();
-  
+
   // mediaCT is data pulled from app
   const mediaCT = useContext(MediaContext);
 
+  // custom search bar hook
   const [searchValue, setSearchValue] = useState("");
-  const [filteredData, setFilteredData] = useState(mediaCT);
+  const [FilteredSearchData] = useSearchBar(mediaCT, "title", searchValue);
 
-  // useEffect is rendered every time searchValue state is changed
-  // this is considered to be a callback effect to setFilteredData
-  useEffect(() => {
-    let filtered = mediaCT.filter(data => {
-      return data.title.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1;
-    });
-    setFilteredData(filtered);
-  }, [searchValue, mediaCT]);
+  const SearchBarElement = (
+    <Box className={classes.Searching}>
+      <TextField
+        id="standard-name"
+        label="Search"
+        value={searchValue}
+        onChange={e => setSearchValue(e.target.value)}
+        margin="normal"
+      />
+    </Box>
+  );
+
+  console.log("landing rendering");
 
   return (
     <div>
       <Box className={classes.Spacing} />
 
-      <Box className={classes.Searching}>
-        <TextField
-          id="standard-name"
-          label="Search"
-          value={searchValue}
-          onChange={e => setSearchValue(e.target.value)}
-          margin="normal"
-        />
-      </Box>
+      {SearchBarElement}
       <Box>
         <Grid container spacing={2} alignItems="center">
-          {filteredData.map((item, key) => (
+          {FilteredSearchData.map((item, key) => (
             <ThumbUnit
               key={key}
               title={item.title}
@@ -62,4 +61,4 @@ function Landing() {
   );
 }
 
-export default Landing;
+export default React.memo(Landing);

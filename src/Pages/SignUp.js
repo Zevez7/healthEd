@@ -74,7 +74,8 @@ function SignUp() {
           .doc(userId)
           .set({
             userName,
-            email
+            email,
+            savedMedia: {}
           });
       })
       .then(() => {

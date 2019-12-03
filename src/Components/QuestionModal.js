@@ -10,7 +10,8 @@ import {
   DialogContent,
   DialogActions,
   Box,
-  MenuItem
+  MenuItem,
+  Typography
 } from "@material-ui/core";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -20,7 +21,7 @@ const useStyles = makeStyles({
     backgroundColor: "white"
   },
   CorrectAnswer: {
-    marginTop: 30,
+    marginTop: 5,
     marginBottom: 20,
     width: 300
   },
@@ -40,6 +41,9 @@ const useStyles = makeStyles({
     backgroundColor: "white",
     marginTop: 40,
     marginRight: 30
+  },
+  Question: {
+    marginBottom: 20
   }
 });
 
@@ -50,8 +54,8 @@ export default function FormDialog(props) {
   // const selectAnswer = [1, 2, 3, 4];
 
   const [question, setQuestion] = useState("");
-
   const [answer, setAnswer] = useState("");
+  const [NoAnswerChoice, setNoAnswerChoice] = useState(false);
 
   const handleQuestionChange = e =>
     setQuestion((e.target.name = e.target.value));
@@ -82,43 +86,49 @@ export default function FormDialog(props) {
 
   //****testing
   console.log("mediaCT", mediaCT);
+  //****testing
+  console.log("answer", answer);
 
   const addQuestion = e => {
     e.preventDefault();
 
-    // add the question to the database
-    // grab the question's ID from the database
-    db.collection(`questions`)
-      .add({
-        question: question,
-        answer: answer,
-        choices: choices
-      })
-      .then(docRef => {
-        // find the array element from the mediaCT list that matches props.Mid
-        let media = mediaCT.find(item => item.id.toString() === props.Mid);
+    if (typeof answer == "number") {
+      // add the question to the database
+      // grab the question's ID from the database
+      db.collection(`questions`)
+        .add({
+          question: question,
+          answer: answer,
+          choices: choices
+        })
+        .then(docRef => {
+          // find the array element from the mediaCT list that matches props.Mid
+          let media = mediaCT.find(item => item.id.toString() === props.Mid);
 
-        // go in and add the new Qid in the slide object array of the media element array
-        media.slide[props.index].Qid = docRef.id;
+          // go in and add the new Qid in the slide object array of the media element array
+          media.slide[props.index].Qid = docRef.id;
 
-        // now reinsert the media.slide with the new Qid as whole to the database
+          // now reinsert the media.slide with the new Qid as whole to the database
 
-        db.collection("media")
-          .doc(props.Mid)
-          .update({
-            slide: media.slide
-          });
-      })
-      .then(() => {
-        console.log("Firebase Add Question");
-      })
-      .catch(error => {
-        console.error("Firebase Add Question error:", error);
-      });
+          db.collection("media")
+            .doc(props.Mid)
+            .update({
+              slide: media.slide
+            });
+        })
+        .then(() => {
+          console.log("Firebase Add Question");
+        })
+        .catch(error => {
+          console.error("Firebase Add Question error:", error);
+        });
 
-    setQuestion("");
-    setAnswer("");
-    setChoices([]);
+      setQuestion("");
+      setAnswer("");
+      setChoices([]);
+    } else {
+      setNoAnswerChoice(true);
+    }
   };
 
   const removeChoice = () => {
@@ -153,6 +163,7 @@ export default function FormDialog(props) {
     setChoices([]);
     setQuestion("");
     setAnswer("");
+    setNoAnswerChoice(false);
     console.log("slidecleared");
   };
   //****testing
@@ -188,9 +199,14 @@ export default function FormDialog(props) {
               variant="outlined"
               fullWidth
               onChange={handleQuestionChange}
+              className={classes.Question}
               required
             />
-
+            {NoAnswerChoice ? (
+              <Typography variant="body1" color="secondary">
+                Choose An Answer
+              </Typography>
+            ) : null}
             <TextField
               id="outlined-select-currency"
               select

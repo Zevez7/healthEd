@@ -9,9 +9,6 @@ const useStyles = makeStyles({
     display: "flex",
     flexWrap: "wrap"
   },
-  input: {
-    margin: 1
-  },
   title: {
     fontWeight: 700
   },
@@ -23,7 +20,7 @@ const useStyles = makeStyles({
     marginTop: 20,
     backgroundColor: "whitesmoke",
     marginRight: "auto",
-    maxWidth: 500
+    width: "auto"
   },
   Button: {
     backgroundColor: "white",

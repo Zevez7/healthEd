@@ -1,26 +1,25 @@
-import React, { useContext, useState } from "react";
-import { Box, Snackbar, Typography } from "@material-ui/core";
+import React, { useContext, useState, useEffect } from "react";
+import { Box, Snackbar, Typography, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 import LibraryMedia from "../Components/LibraryMedia";
-import { MediaContext } from "../App";
+import { MediaContext, UserDataContext } from "../App";
 import useSnackBar from "../Hooks/useSnackBar";
-import { TextField } from "@material-ui/core/";
 import useSearchBar from "./../Hooks/useSearchBar";
 
 const useStyles = makeStyles({
   root: {
     width: "100%"
   },
-  topSpacing: {
-    paddingTop: 40
-  },
   Panel: {
     marginBottom: 10
   },
   SnackbarDelete: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#F44336",
     color: "white"
+  },
+  topSpacing: {
+    paddingTop: 40
   },
   title: {
     fontWeight: 700
@@ -33,12 +32,25 @@ const useStyles = makeStyles({
 const Library = () => {
   const classes = useStyles();
   const mediaCT = useContext(MediaContext);
+  const userDataCT = useContext(UserDataContext);
+  const [userMedia, setUserMedia] = useState([]);
 
   //****testing
   console.log("mediaCT landing", mediaCT);
 
+  // filters out all media that doesn't match the current userData userName
+  useEffect(() => {
+    if (mediaCT && userDataCT) {
+      const userNameFilter = mediaCT.filter(data => {
+        return data.username === userDataCT.userName;
+      });
+      setUserMedia(userNameFilter);
+    }
+  }, [mediaCT, userDataCT]);
+
+  // custom search bar hook
   const [searchValue, setSearchValue] = useState("");
-  const [FilteredSearchData] = useSearchBar(mediaCT, "title", searchValue);
+  const [FilteredSearchData] = useSearchBar(userMedia, "title", searchValue);
 
   const SearchBarElement = (
     <Box className={classes.Searching}>
@@ -51,7 +63,8 @@ const Library = () => {
       />
     </Box>
   );
-  // custom snackBar hook
+
+  // custom snackBar Hook array destructuring
   const [
     handleSnackBarOpen,
     handleSnackBarClose,
@@ -80,22 +93,27 @@ const Library = () => {
       {SnackBarElement}
       <Box className={classes.topSpacing}></Box>
       <Typography variant="h4" className={classes.title}>
-        LIBRARY
+        MEDIA
       </Typography>
       {SearchBarElement}
-      {FilteredSearchData.map((item, index) => (
-        <Box className={classes.Panel} key={`media-${index}`}>
-          <LibraryMedia
-            handleSnackBarOpen={handleSnackBarOpen}
-            id={item.id}
-            title={item.title}
-            slide={item.slide}
-            info={item.info}
-            username={item.username}
-            date={item.date}
-          />
-        </Box>
-      ))}
+      <Box className={classes.topSpacing}></Box>
+      {FilteredSearchData.length > 0 ? (
+        FilteredSearchData.map((item, index) => (
+          <Box className={classes.Panel} key={`media-${index}`}>
+            <LibraryMedia
+              handleSnackBarOpen={handleSnackBarOpen}
+              id={item.id}
+              title={item.title}
+              slide={item.slide}
+              info={item.info}
+              username={item.username}
+              date={item.date}
+            />
+          </Box>
+        ))
+      ) : (
+        <Typography variant="body1">No media has been submitted</Typography>
+      )}
     </div>
   );
 };

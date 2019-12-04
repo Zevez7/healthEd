@@ -11,7 +11,8 @@ const useStyles = makeStyles({
     paddingTop: 50
   },
   Searching: {
-    padding: 20
+    paddingTop: 20,
+    paddingBottom: 20
   }
 });
 

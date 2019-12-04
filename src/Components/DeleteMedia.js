@@ -1,13 +1,6 @@
 import React from "react";
 import { db } from "./Firebase";
 import ConfirmationDialogBox from "./ConfirmationDialogBox";
-// import { makeStyles } from "@material-ui/core/styles";
-
-// const useStyles = makeStyles({
-//   ChoiceButton: {
-//     backgroundColor: "white"
-//   }
-// });
 
 const DeleteMedia = props => {
   // const classes = useStyles();

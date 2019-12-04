@@ -5,7 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import LibraryMedia from "../Components/LibraryMedia";
 import { MediaContext, UserDataContext } from "../App";
 import useSnackBar from "../Hooks/useSnackBar";
-import useSearchBar from "./../Hooks/useSearchBar";
+import useSearchBar from "../Hooks/useSearchBar";
 
 const useStyles = makeStyles({
   root: {
@@ -25,7 +25,8 @@ const useStyles = makeStyles({
     fontWeight: 700
   },
   Searching: {
-    padding: 20
+    paddingTop: 20,
+    paddingBottom: 20
   }
 });
 
@@ -96,7 +97,6 @@ const Library = () => {
         MEDIA
       </Typography>
       {SearchBarElement}
-      <Box className={classes.topSpacing}></Box>
       {FilteredSearchData.length > 0 ? (
         FilteredSearchData.map((item, index) => (
           <Box className={classes.Panel} key={`media-${index}`}>

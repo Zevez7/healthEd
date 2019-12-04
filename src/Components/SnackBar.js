@@ -1,33 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import Snackbar from "@material-ui/core/Snackbar";
 
-export default function PositionedSnackbar({ show }) {
+export default function PositionedSnackbar(props) {
   const [state, setState] = React.useState({
-    open: show,
+    open: false,
     vertical: "top",
     horizontal: "center"
   });
 
   const { vertical, horizontal, open } = state;
 
-  const handleClick = newState => () => {
-    setState({ open: true, ...newState });
+  const handleClick = () => () => {
+    setState({ ...state, open: true });
   };
 
   const handleClose = () => {
     setState({ ...state, open: false });
   };
-  
+
+  props.HandleSnackBarOpen && handleClick()
 
   //****testing
-  console.log("show", show);
-
+  console.log("props.HandleSnackBarOpen", props.HandleSnackBarOpen);
   return (
     <div>
-      <Button onClick={handleClick({ vertical: "top", horizontal: "center" })}>
-        Top-Center
-      </Button>
+      {props.HandleSnackBarOpen && <Button>Top-Center</Button>}
 
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}

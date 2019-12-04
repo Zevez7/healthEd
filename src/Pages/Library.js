@@ -26,7 +26,8 @@ const useStyles = makeStyles({
     fontWeight: 700
   },
   Searching: {
-    padding: 20
+    paddingTop: 20,
+    paddingBottom: 20
   }
 });
 
